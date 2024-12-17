@@ -350,8 +350,8 @@ public class AircraftEntity extends Entity {
     protected Vec3 getPassengerAttachmentPoint(Entity passenger, EntityDimensions dimensions, float scaleFactor) {
         // Seat's relative position (local space)
         double seatX = 0.0; // Example X offset
-        double seatY = 1.0; // Example Y offset (height)
-        double seatZ = 2.0; // Example Z offset (depth/backward)
+        double seatY = 1.5; // Example Y offset (height)
+        double seatZ = 0.0; // Example Z offset (depth/backward)
         double pivotOffset=1.5;
 
         Vec3 vec = new Vec3( seatX, seatY-pivotOffset, seatZ)

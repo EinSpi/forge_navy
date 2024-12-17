@@ -36,9 +36,10 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
         poseStack.translate(0.0D, 1.5D, 0.0D);
         // Adjust Y offset to align the model with the ground
         poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
-        poseStack.mulPose(Axis.YP.rotationDegrees(entity.normalizedYRot+90.0f)); // Yaw (horizontal rotation)
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-entity.normalizedXRot));
-        poseStack.mulPose(Axis.XP.rotationDegrees(-entity.normalizedZRot));// Pitch (vertical rotation)
+        poseStack.mulPose(Axis.YP.rotationDegrees(entity.normalizedYRot));
+        poseStack.mulPose(Axis.XP.rotationDegrees(-entity.normalizedXRot));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(-entity.normalizedZRot));
+        // Pitch (vertical rotation)
 
         // Rotate model to align with entity's pitch
         this.model.renderToBuffer(
