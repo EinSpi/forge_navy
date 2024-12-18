@@ -2,6 +2,7 @@ package com.gmail.yichentang777.tyc_mod.entities;
 
 
 import com.mojang.logging.LogUtils;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -44,6 +45,9 @@ public class AircraftEntity extends Entity {
     public float normalizedYRot=0.0f;
     public float normalizedXRot=0.0f;
     public float normalizedZRot=0.0f;
+    public Vec3 MainZ=new Vec3(0.0d,0.0d,1.0d);
+    public Vec3 MainX=new Vec3(1.0d,0.0d,0.0d);
+    public Vec3 MainY=new Vec3(0.0d,1.0d,0.0d);
 
     public AircraftEntity(EntityType<? extends AircraftEntity> entityType, Level level) {
         super(entityType, level);
@@ -79,6 +83,11 @@ public class AircraftEntity extends Entity {
         this.applyGravity();
         this.applyFriction();
         this.applySpeedThreshold();
+        if(!this.level().isClientSide) {
+            LOGGER.info("mainZ"+this.MainZ);
+            LOGGER.info("speed"+this.getDeltaMovement());
+            LOGGER.info("x{} y{} z{}",this.getX(),this.getY(),this.getZ());
+        }
 
 
         if (this.isControlledByLocalInstance()){
@@ -242,57 +251,68 @@ public class AircraftEntity extends Entity {
     public void controlAircraft(){
         if (this.getControllingPassenger() instanceof LocalPlayer lp)
         {
-
+//            LOGGER.info("MainZ"+this.MainZ);
+//            LOGGER.info("MainY"+this.MainY);
+//            LOGGER.info("MainX"+this.MainX);
+//            LOGGER.info("yaw {} pitch {} roll {}", this.recoverRotationsFromCoordinate()[0],
+//                    this.recoverRotationsFromCoordinate()[1],
+//                    this.recoverRotationsFromCoordinate()[2]);
             if (lp.input.left && !lp.input.right)
             {
-                if(this.isXRotNormal()^this.isZRotNormal()) {
-                    //abnormal case, Y need to be inversed.
-                    //this.addYRot();
-                    this.setYRot(this.getYRot()+3.0f);
-
-                }
-                else{
-                    //this.minusYRot();
-                    this.setYRot(this.getYRot()-3.0f);
-                }
+//                if(this.isXRotNormal()^this.isZRotNormal()) {
+//                    //abnormal case, Y need to be inversed.
+//                    //this.addYRot();
+//                    this.setYRot(this.getYRot()+3.0f);
+//
+//                }
+//                else{
+//                    //this.minusYRot();
+//                    this.setYRot(this.getYRot()-3.0f);
+//                }
+                this.MainZ=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainZ);
+                this.MainY=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainY);
+                this.MainX=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainX);
             }
             else if (lp.input.right && !lp.input.left)
             {
-                if (this.isXRotNormal()^this.isZRotNormal()) {
-                    //this.minusYRot();
-                    this.setYRot(this.getYRot()-3.0f);
-
-                }
-                else{
-                    //this.addYRot();
-                    this.setYRot(this.getYRot()+3.0f);
-                }
+//                if (this.isXRotNormal()^this.isZRotNormal()) {
+//                    //this.minusYRot();
+//                    this.setYRot(this.getYRot()-3.0f);
+//
+//                }
+//                else{
+//                    //this.addYRot();
+//                    this.setYRot(this.getYRot()+3.0f);
+//                }
+                this.MainZ=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainZ);
+                this.MainY=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainY);
+                this.MainX=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainX);
             }
 
 
 
             if (lp.input.jumping){
                 if (lp.input.down){
-                    if (this.isZRotNormal()) {
+
                         //normal case
                         //this.addXRot();
-                        this.setXRot(this.getXRot()+3.0f);
-                    }
-                    else {
-                        //this.minusXRot();
-                        this.setXRot(this.getXRot()-3.0f);
-                    }
+                        //this.setXRot(this.getXRot()+3.0f);
+                        //this.handlePitch(3.0f);
+                    this.MainZ=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainZ);
+                    this.MainY=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainY);
+                    this.MainX=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainX);
+
+
                 }
                 else {
-                    if (this.isZRotNormal()) {
-                        //this.minusXRot();
-                        this.setXRot(this.getXRot()-3.0f);
-                    }
-                    else {
-                        //this.addXRot();
-                        this.setXRot(this.getXRot()+3.0f);
 
-                    }
+                        //this.minusXRot();
+                        //this.setXRot(this.getXRot()-3.0f);
+                        //this.handlePitch(-3.0f);
+                    this.MainZ=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainZ);
+                    this.MainY=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainY);
+                    this.MainX=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainX);
+
                 }
             }
 
@@ -301,17 +321,22 @@ public class AircraftEntity extends Entity {
 
             if (lp.input.left && lp.input.right){
                 //this.addZRot();
-                this.setZRot(this.getZRot()+3.0f);
+                //this.setZRot(this.getZRot()+3.0f);
+                this.MainZ=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainZ);
+                this.MainY=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainY);
+                this.MainX=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainX);
 
             }
             if (lp.input.up && lp.input.down){
                 //left roll
                 //this.minusZRot();
-                this.setZRot(this.getZRot()-3.0f);
+                //this.setZRot(this.getZRot()-3.0f);
+                this.MainZ=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainZ);
+                this.MainY=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainY);
+                this.MainX=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainX);
             }
 
-            this.setNormalizeAngle();
-//            LOGGER.info("speed: " + speed);
+
 
             if (lp.input.up && !lp.input.down){
                 controlledSpeed=controlledSpeed<=2.0d?controlledSpeed+0.1d:controlledSpeed;
@@ -320,12 +345,7 @@ public class AircraftEntity extends Entity {
                 controlledSpeed=controlledSpeed>=-2.0d?controlledSpeed-0.1d:controlledSpeed;
             }
 
-            this.setDeltaMovement(
-                    (double)(Mth.sin(-this.getYRot() * (float) (Math.PI / 180.0)) * Mth.cos(this.getXRot()*(float)(Math.PI/180.0)) * controlledSpeed),
-                    (double)(Mth.sin(-this.getXRot() * (float) (Math.PI / 180.0)) * controlledSpeed),
-                    (double)(Mth.cos(this.getYRot() * (float) (Math.PI / 180.0)) * Mth.cos(this.getXRot()*(float)(Math.PI/180.0)) *controlledSpeed));
-
-            //this.setDeltaMovement(lp.input.up?0.2D:0.0D,lp.input.jumping?0.2D:0.0D,lp.input.down?0.2D:0.0D);
+            this.setDeltaMovement(this.MainZ.scale(controlledSpeed));
 
         }
 
@@ -365,49 +385,11 @@ public class AircraftEntity extends Entity {
         return rotateAxisInternal(this.zRot,z_axis.x,z_axis.y,z_axis.z,vec).add(0.0d,pivotOffset,0.0d);
     }
 
-    public void addZRot(){
-        // +180 ok
-        this.zRot=this.zRot>=180.0f?this.zRot+1.0f-360.0f:this.zRot+1.0f;
-    }
 
-    public void minusZRot(){
-        this.zRot=this.zRot<=-179.0f?this.zRot-1.0f+360.0f:this.zRot-1.0f;
-    }
     
-    public void addXRot(){
-        this.setXRot(this.getXRot()>=180.0f?this.getXRot()+2.0f-360.0f:this.getXRot()+2.0f);
-    }
-    
-    public void minusXRot(){
-        this.setXRot(this.getXRot()<=-179.0?this.getXRot()-2.0f+360.0f:this.getXRot()-2.0f);
-    }
 
-    public void addYRot(){
-        this.setYRot(this.getYRot()>=180.0f?this.getYRot()+2.0f-360.0f:this.getYRot()+2.0f);
-    }
 
-    public void minusYRot(){
-        this.setYRot(this.getYRot()<=-179.0?this.getYRot()-2.0f+360.0f:this.getYRot()-2.0f);
-    }
 
-    public boolean isXRotNormal(){
-        return this.normalizedXRot<90.0f && this.normalizedXRot>-90.0f;
-    }
-
-    public boolean isZRotNormal(){
-        return this.normalizedZRot<90.0f && this.normalizedZRot>-90.0f;
-    }
-
-    public void rollToLeftSlightly(){
-        if (this.zRot<=10.0f && this.zRot>=-10.0f){
-            this.minusZRot();
-        }
-    }
-    public void rollToRightSlightly(){
-        if (this.zRot<=10.0f && this.zRot>=-10.0f){
-            this.addZRot();
-        }
-    }
     
     public Vec3 rotateAxisInternal(float angle, double aX, double aY, double aZ, Vec3 vec) {
         float hangle = angle * 0.5f;
@@ -436,27 +418,55 @@ public class AircraftEntity extends Entity {
         return new Vec3(x_end, y_end, z_end);
     }
 
-    public float getZRot() {
-        return zRot;
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public double[] recoverRotationsFromCoordinate(){
+        Vec3 x_before_roll=new Vec3(this.MainZ.z,0.0d,-MainZ.x).normalize();
+
+
+        double rollangle = Math.toDegrees(Math.acos(this.MainX.dot(x_before_roll)));
+        double cross_product_length=this.MainX.cross(x_before_roll).length();
+        if (cross_product_length<=0.01){
+            if (rollangle<90.0d){
+                rollangle=0.0d;
+            }
+            else{
+                rollangle=180.0d;
+            }
+        }
+        else if (this.MainX.cross(x_before_roll).dot(this.MainZ) > 0.0d){
+            rollangle=-rollangle;
+        }
+        Vec3 y_before_roll = this.MainZ.cross(x_before_roll).normalize();
+        double pitchangle=Math.toDegrees(Math.acos(y_before_roll.dot(new Vec3(0.0d,1.0d,0.0d))));
+        if (this.MainZ.y<0){
+            pitchangle=-pitchangle;
+        }
+        double yawangle =Math.toDegrees(Math.acos(x_before_roll.dot(new Vec3(1.0d,0.0d,0.0d))));
+        if (this.MainZ.x>=0){
+            yawangle=-yawangle;
+        }
+
+        double[] res =new double[3];
+        res[0]=yawangle;res[1]=pitchangle;res[2]=rollangle;
+        return res;
+
     }
 
-    public void setZRot(float zRot) {
-        this.zRot = zRot;
-    }
 
-    private float normalizeAngle(float angle) {
-        // Normalize angle to the range [-180, 180]
-        while (angle > 180.0f) angle -= 360.0f;
-        while (angle < -180.0f) angle += 360.0f;
-        return angle;
-    }
 
-    public void setNormalizeAngle()
-    {
-        this.normalizedXRot = normalizeAngle(this.getXRot());
-        this.normalizedYRot = normalizeAngle(this.getYRot());
-        this.normalizedZRot = normalizeAngle(this.getZRot());
-    }
+
 
 
 }
