@@ -18,7 +18,7 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
 
     private final AircraftModel model;
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(TycMod.MODID, "textures/entity/aircraft.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(TycMod.MODID, "textures/entity/aircraft3.png");
 
     public AircraftEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -36,9 +36,14 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
         poseStack.translate(0.0D, 1.5D, 0.0D);
         // Adjust Y offset to align the model with the ground
         poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
-        poseStack.mulPose(Axis.YP.rotationDegrees(entity.normalizedYRot));
-        poseStack.mulPose(Axis.XP.rotationDegrees(-entity.normalizedXRot));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-entity.normalizedZRot));
+        double[] eulerangles=entity.recoverRotationsFromCoordinate();
+//        poseStack.mulPose(Axis.YP.rotationDegrees(entity.normalizedYRot));
+//        poseStack.mulPose(Axis.XP.rotationDegrees(-entity.normalizedXRot));
+//        poseStack.mulPose(Axis.ZP.rotationDegrees(-entity.normalizedZRot));
+        poseStack.mulPose(Axis.YP.rotation(-(float)eulerangles[1]));
+        poseStack.mulPose(Axis.XP.rotation(-(float)eulerangles[0]));
+        poseStack.mulPose(Axis.YP.rotation(-(float)eulerangles[2]));
+
         // Pitch (vertical rotation)
 
         // Rotate model to align with entity's pitch

@@ -2,6 +2,7 @@ package com.gmail.yichentang777.tyc_mod.entities;
 
 
 import com.mojang.logging.LogUtils;
+import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -44,6 +45,9 @@ public class AircraftEntity extends Entity {
     public float normalizedYRot=0.0f;
     public float normalizedXRot=0.0f;
     public float normalizedZRot=0.0f;
+    public Vec3 MainZ=new Vec3(0.0d,0.0d,1.0d);
+    public Vec3 MainX=new Vec3(1.0d,0.0d,0.0d);
+    public Vec3 MainY=new Vec3(0.0d,1.0d,0.0d);
 
     public AircraftEntity(EntityType<? extends AircraftEntity> entityType, Level level) {
         super(entityType, level);
@@ -79,6 +83,7 @@ public class AircraftEntity extends Entity {
         this.applyGravity();
         this.applyFriction();
         this.applySpeedThreshold();
+
 
 
         if (this.isControlledByLocalInstance()){
@@ -243,89 +248,23 @@ public class AircraftEntity extends Entity {
         if (this.getControllingPassenger() instanceof LocalPlayer lp)
         {
 
-            if (lp.input.left && !lp.input.right)
+            if (lp.input.left)
             {
-                if(this.isXRotNormal()^this.isZRotNormal()) {
-                    //abnormal case, Y need to be inversed.
-                    //this.addYRot();
-                    this.setYRot(this.getYRot()+3.0f);
-
-                }
-                else{
-                    //this.minusYRot();
-                    this.setYRot(this.getYRot()-3.0f);
-                }
+                this.left();
             }
-            else if (lp.input.right && !lp.input.left)
+            else if (lp.input.right)
             {
-                if (this.isXRotNormal()^this.isZRotNormal()) {
-                    //this.minusYRot();
-                    this.setYRot(this.getYRot()-3.0f);
-
-                }
-                else{
-                    //this.addYRot();
-                    this.setYRot(this.getYRot()+3.0f);
-                }
+                this.right();
             }
 
-
-
-            if (lp.input.jumping){
-                if (lp.input.down){
-                    if (this.isZRotNormal()) {
-                        //normal case
-                        //this.addXRot();
-                        this.setXRot(this.getXRot()+3.0f);
-                    }
-                    else {
-                        //this.minusXRot();
-                        this.setXRot(this.getXRot()-3.0f);
-                    }
-                }
-                else {
-                    if (this.isZRotNormal()) {
-                        //this.minusXRot();
-                        this.setXRot(this.getXRot()-3.0f);
-                    }
-                    else {
-                        //this.addXRot();
-                        this.setXRot(this.getXRot()+3.0f);
-
-                    }
-                }
-            }
-
-
-
-
-            if (lp.input.left && lp.input.right){
-                //this.addZRot();
-                this.setZRot(this.getZRot()+3.0f);
-
-            }
-            if (lp.input.up && lp.input.down){
-                //left roll
-                //this.minusZRot();
-                this.setZRot(this.getZRot()-3.0f);
-            }
-
-            this.setNormalizeAngle();
-//            LOGGER.info("speed: " + speed);
-
-            if (lp.input.up && !lp.input.down){
+            if (lp.input.up){
                 controlledSpeed=controlledSpeed<=2.0d?controlledSpeed+0.1d:controlledSpeed;
             }
-            else if (lp.input.down && !lp.input.jumping && !lp.input.up){
+            if (lp.input.down ){
                 controlledSpeed=controlledSpeed>=-2.0d?controlledSpeed-0.1d:controlledSpeed;
             }
 
-            this.setDeltaMovement(
-                    (double)(Mth.sin(-this.getYRot() * (float) (Math.PI / 180.0)) * Mth.cos(this.getXRot()*(float)(Math.PI/180.0)) * controlledSpeed),
-                    (double)(Mth.sin(-this.getXRot() * (float) (Math.PI / 180.0)) * controlledSpeed),
-                    (double)(Mth.cos(this.getYRot() * (float) (Math.PI / 180.0)) * Mth.cos(this.getXRot()*(float)(Math.PI/180.0)) *controlledSpeed));
-
-            //this.setDeltaMovement(lp.input.up?0.2D:0.0D,lp.input.jumping?0.2D:0.0D,lp.input.down?0.2D:0.0D);
+            this.setDeltaMovement(this.MainZ.scale(controlledSpeed));
 
         }
 
@@ -365,49 +304,11 @@ public class AircraftEntity extends Entity {
         return rotateAxisInternal(this.zRot,z_axis.x,z_axis.y,z_axis.z,vec).add(0.0d,pivotOffset,0.0d);
     }
 
-    public void addZRot(){
-        // +180 ok
-        this.zRot=this.zRot>=180.0f?this.zRot+1.0f-360.0f:this.zRot+1.0f;
-    }
 
-    public void minusZRot(){
-        this.zRot=this.zRot<=-179.0f?this.zRot-1.0f+360.0f:this.zRot-1.0f;
-    }
     
-    public void addXRot(){
-        this.setXRot(this.getXRot()>=180.0f?this.getXRot()+2.0f-360.0f:this.getXRot()+2.0f);
-    }
-    
-    public void minusXRot(){
-        this.setXRot(this.getXRot()<=-179.0?this.getXRot()-2.0f+360.0f:this.getXRot()-2.0f);
-    }
 
-    public void addYRot(){
-        this.setYRot(this.getYRot()>=180.0f?this.getYRot()+2.0f-360.0f:this.getYRot()+2.0f);
-    }
 
-    public void minusYRot(){
-        this.setYRot(this.getYRot()<=-179.0?this.getYRot()-2.0f+360.0f:this.getYRot()-2.0f);
-    }
 
-    public boolean isXRotNormal(){
-        return this.normalizedXRot<90.0f && this.normalizedXRot>-90.0f;
-    }
-
-    public boolean isZRotNormal(){
-        return this.normalizedZRot<90.0f && this.normalizedZRot>-90.0f;
-    }
-
-    public void rollToLeftSlightly(){
-        if (this.zRot<=10.0f && this.zRot>=-10.0f){
-            this.minusZRot();
-        }
-    }
-    public void rollToRightSlightly(){
-        if (this.zRot<=10.0f && this.zRot>=-10.0f){
-            this.addZRot();
-        }
-    }
     
     public Vec3 rotateAxisInternal(float angle, double aX, double aY, double aZ, Vec3 vec) {
         float hangle = angle * 0.5f;
@@ -436,27 +337,87 @@ public class AircraftEntity extends Entity {
         return new Vec3(x_end, y_end, z_end);
     }
 
-    public float getZRot() {
-        return zRot;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public double[] recoverRotationsFromCoordinate(){
+        double beta = Math.atan2(Math.sqrt((MainZ.y*MainZ.y)+(MainX.y*MainX.y)),MainY.y);
+        double alpha;
+        double gamma;
+        if (beta<=0.017d){
+            beta = 0.0d;
+            alpha = 0.0d;
+            gamma = Math.atan2(-MainX.z, MainZ.z);
+        }
+        else if (beta>=3.124d)
+        {
+            beta = Math.PI;
+            alpha =0.0d;
+            gamma = Math.atan2(MainX.z, -MainZ.z);
+        }
+        else{
+            alpha = Math.atan2(MainY.x/Math.sin(beta), MainY.z/Math.sin(beta));
+            gamma = Math.atan2(MainX.y/Math.sin(beta), -MainZ.y/Math.sin(beta));
+        }
+
+        double[] res = new double[3];
+        res[0] = beta;
+        res[1] = alpha;
+        res[2] = gamma;
+        return res;
+
     }
 
-    public void setZRot(float zRot) {
-        this.zRot = zRot;
+    public void roll_left(){
+        this.MainZ=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainZ);
+        this.MainY=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainY);
+        this.MainX=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainX);
     }
 
-    private float normalizeAngle(float angle) {
-        // Normalize angle to the range [-180, 180]
-        while (angle > 180.0f) angle -= 360.0f;
-        while (angle < -180.0f) angle += 360.0f;
-        return angle;
+    public void roll_right(){
+        this.MainZ=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainZ);
+        this.MainY=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainY);
+        this.MainX=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainX);
     }
 
-    public void setNormalizeAngle()
-    {
-        this.normalizedXRot = normalizeAngle(this.getXRot());
-        this.normalizedYRot = normalizeAngle(this.getYRot());
-        this.normalizedZRot = normalizeAngle(this.getZRot());
+    public void lift(){
+        this.MainZ=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainZ);
+        this.MainY=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainY);
+        this.MainX=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainX);
     }
+
+    public void dive(){
+        this.MainZ=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainZ);
+        this.MainY=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainY);
+        this.MainX=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainX);
+    }
+
+    public void left(){
+        this.MainZ=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainZ);
+        this.MainY=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainY);
+        this.MainX=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainX);
+    }
+
+    public void right(){
+        this.MainZ=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainZ);
+        this.MainY=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainY);
+        this.MainX=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainX);
+    }
+
+
+
 
 
 }
