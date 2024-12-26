@@ -41,6 +41,7 @@ public class AircraftEntity extends Entity {
 
     protected float zRot=0.0f;
 
+
     public double controlledSpeed=0.0d;
     public float normalizedYRot=0.0f;
     public float normalizedXRot=0.0f;
@@ -52,6 +53,8 @@ public class AircraftEntity extends Entity {
     public AircraftEntity(EntityType<? extends AircraftEntity> entityType, Level level) {
         super(entityType, level);
     }
+
+
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_333664_) {
@@ -265,6 +268,7 @@ public class AircraftEntity extends Entity {
             }
 
             this.setDeltaMovement(this.MainZ.scale(controlledSpeed));
+            //LOGGER.info("Y Pos Aircraft {}, Y Pos Player {}",this.getY(),this.getControllingPassenger().getY());
 
         }
 
@@ -287,21 +291,7 @@ public class AircraftEntity extends Entity {
 
     @Override
     protected Vec3 getPassengerAttachmentPoint(Entity passenger, EntityDimensions dimensions, float scaleFactor) {
-        // Seat's relative position (local space)
-        double seatX = 0.0; // Example X offset
-        double seatY = 1.5; // Example Y offset (height)
-        double seatZ = 0.0; // Example Z offset (depth/backward)
-        double pivotOffset=1.5;
-
-        Vec3 vec = new Vec3( seatX, seatY-pivotOffset, seatZ)
-                .xRot(-this.getXRot()* (float) (Math.PI / 180.0))
-                .yRot(-this.getYRot()* (float) (Math.PI / 180.0));
-
-        Vec3 z_axis=new Vec3(0.0d,0.0d,1.0d)
-                .xRot(-this.getXRot()* (float) (Math.PI / 180.0))
-                .yRot(-this.getYRot()* (float) (Math.PI / 180.0));
-
-        return rotateAxisInternal(this.zRot,z_axis.x,z_axis.y,z_axis.z,vec).add(0.0d,pivotOffset,0.0d);
+        return new Vec3(0.0,1.5,0.0);
     }
 
 

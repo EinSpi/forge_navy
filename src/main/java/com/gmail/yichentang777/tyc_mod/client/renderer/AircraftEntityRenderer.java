@@ -33,13 +33,11 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
     @Override
     public void render(AircraftEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
-        poseStack.translate(0.0D, 1.5D, 0.0D);
+        poseStack.translate(0.0D, 2.3D, 0.0D);
         // Adjust Y offset to align the model with the ground
         poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
         double[] eulerangles=entity.recoverRotationsFromCoordinate();
-//        poseStack.mulPose(Axis.YP.rotationDegrees(entity.normalizedYRot));
-//        poseStack.mulPose(Axis.XP.rotationDegrees(-entity.normalizedXRot));
-//        poseStack.mulPose(Axis.ZP.rotationDegrees(-entity.normalizedZRot));
+
         poseStack.mulPose(Axis.YP.rotation(-(float)eulerangles[1]));
         poseStack.mulPose(Axis.XP.rotation(-(float)eulerangles[0]));
         poseStack.mulPose(Axis.YP.rotation(-(float)eulerangles[2]));
