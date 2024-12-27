@@ -12,11 +12,12 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.jetbrains.annotations.NotNull;
 
-public class PilotRendererLayer  extends RenderLayer<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>>{
+public class PilotRendererLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
 
-    public PilotRendererLayer(RenderLayerParent<AbstractClientPlayer,PlayerModel<AbstractClientPlayer>> parent) {
+    public PilotRendererLayer(RenderLayerParent<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> parent) {
         super(parent);
     }
+
     @Override
     public void render(@NotNull PoseStack poseStack, @NotNull MultiBufferSource buffer, int packedLight,
                        @NotNull AbstractClientPlayer player, float limbSwing, float limbSwingAmount,
