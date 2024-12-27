@@ -2,58 +2,42 @@ package com.gmail.yichentang777.tyc_mod.entities;
 
 
 import com.mojang.logging.LogUtils;
-import it.unimi.dsi.fastutil.doubles.DoubleList;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-
 import net.minecraft.network.syncher.SynchedEntityData;
-
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
-
-import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 
 public class AircraftEntity extends Entity {
+
     private static final Logger LOGGER = LogUtils.getLogger();
     protected int lerpSteps;
     protected double lerpX;
     protected double lerpY;
     protected double lerpZ;
-
-
     protected double lerpYRot;
     protected double lerpXRot;
 
-    protected float zRot=0.0f;
-
-
-    public double controlledSpeed=0.0d;
-    public float normalizedYRot=0.0f;
-    public float normalizedXRot=0.0f;
-    public float normalizedZRot=0.0f;
-    public Vec3 MainZ=new Vec3(0.0d,0.0d,1.0d);
-    public Vec3 MainX=new Vec3(1.0d,0.0d,0.0d);
-    public Vec3 MainY=new Vec3(0.0d,1.0d,0.0d);
+    public double controlledSpeed = 0.0d;
+    public Vec3 MainZ = new Vec3(0.0d, 0.0d, 1.0d);
+    public Vec3 MainX = new Vec3(1.0d, 0.0d, 0.0d);
+    public Vec3 MainY = new Vec3(0.0d, 1.0d, 0.0d);
 
     public AircraftEntity(EntityType<? extends AircraftEntity> entityType, Level level) {
         super(entityType, level);
     }
-
 
 
     @Override
@@ -77,7 +61,6 @@ public class AircraftEntity extends Entity {
     }
 
 
-
     @Override
     public void tick() {
 
@@ -88,8 +71,7 @@ public class AircraftEntity extends Entity {
         this.applySpeedThreshold();
 
 
-
-        if (this.isControlledByLocalInstance()){
+        if (this.isControlledByLocalInstance()) {
             if (this.level().isClientSide) {
                 this.controlAircraft();
             }
@@ -101,19 +83,14 @@ public class AircraftEntity extends Entity {
         //LOGGER.info("pitch {}", this.getXRot());
 
 
-
-       this.checkInsideBlocks();
+        this.checkInsideBlocks();
         //handles push despite being defined as can be collided with.
         // The push box is customized by a inflation, making push happen before collision.
         this.handlePush();
-
-//
-
-
     }
 
-    public void applyFriction(){
-        if(this.onGround()){
+    public void applyFriction() {
+        if (this.onGround()) {
             this.setDeltaMovement(this.getDeltaMovement().scale(0.96));
         }
     }
@@ -129,6 +106,7 @@ public class AircraftEntity extends Entity {
         //key attribute that enable the player to step on that without pushing it away.
         return true;
     }
+
     public static boolean canVehicleCollide(Entity p_38324_, Entity p_38325_) {
         return (p_38325_.canBeCollidedWith() || p_38325_.isPushable()) && !p_38324_.isPassengerOfSameVehicle(p_38325_);
     }
@@ -178,15 +156,13 @@ public class AircraftEntity extends Entity {
     }
 
 
-
-
     @Override
     public void lerpTo(double p_38299_, double p_38300_, double p_38301_, float p_38302_, float p_38303_, int p_38304_) {
         this.lerpX = p_38299_;
         this.lerpY = p_38300_;
         this.lerpZ = p_38301_;
-        this.lerpYRot = (double)p_38302_;
-        this.lerpXRot = (double)p_38303_;
+        this.lerpYRot = (double) p_38302_;
+        this.lerpXRot = (double) p_38303_;
         this.lerpSteps = p_38304_;
     }
 
@@ -207,16 +183,16 @@ public class AircraftEntity extends Entity {
 
     @Override
     public float lerpTargetXRot() {
-        return this.lerpSteps > 0 ? (float)this.lerpXRot : this.getXRot();
+        return this.lerpSteps > 0 ? (float) this.lerpXRot : this.getXRot();
     }
 
     @Override
     public float lerpTargetYRot() {
-        return this.lerpSteps > 0 ? (float)this.lerpYRot : this.getYRot();
+        return this.lerpSteps > 0 ? (float) this.lerpYRot : this.getYRot();
     }
 
     @Override
-    public Direction getMotionDirection() {
+    public @NotNull Direction getMotionDirection() {
         return this.getDirection().getClockWise();
     }
 
@@ -231,13 +207,13 @@ public class AircraftEntity extends Entity {
     }
 
     @Override
-    public InteractionResult interact(Player p_38330_, InteractionHand p_38331_) {
-            this.controlledSpeed=0.0d;
-            if (!this.level().isClientSide) {
-                return p_38330_.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
-            } else {
-                return InteractionResult.SUCCESS;
-            }
+    public @NotNull InteractionResult interact(@NotNull Player player, @NotNull InteractionHand hand) {
+        this.controlledSpeed = 0.0d;
+        if (!this.level().isClientSide) {
+            return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
+        } else {
+            return InteractionResult.SUCCESS;
+        }
 
     }
 
@@ -247,24 +223,20 @@ public class AircraftEntity extends Entity {
         return this.getFirstPassenger() instanceof LivingEntity livingentity ? livingentity : super.getControllingPassenger();
     }
 
-    public void controlAircraft(){
-        if (this.getControllingPassenger() instanceof LocalPlayer lp)
-        {
+    public void controlAircraft() {
+        if (this.getControllingPassenger() instanceof LocalPlayer lp) {
 
-            if (lp.input.left)
-            {
+            if (lp.input.left) {
                 this.left();
-            }
-            else if (lp.input.right)
-            {
+            } else if (lp.input.right) {
                 this.right();
             }
 
-            if (lp.input.up){
-                controlledSpeed=controlledSpeed<=2.0d?controlledSpeed+0.1d:controlledSpeed;
+            if (lp.input.up) {
+                controlledSpeed = controlledSpeed <= 2.0d ? controlledSpeed + 0.1d : controlledSpeed;
             }
-            if (lp.input.down ){
-                controlledSpeed=controlledSpeed>=-2.0d?controlledSpeed-0.1d:controlledSpeed;
+            if (lp.input.down) {
+                controlledSpeed = controlledSpeed >= -2.0d ? controlledSpeed - 0.1d : controlledSpeed;
             }
 
             this.setDeltaMovement(this.MainZ.scale(controlledSpeed));
@@ -275,8 +247,8 @@ public class AircraftEntity extends Entity {
 
     }
 
-    public void handlePush(){
-        List<Entity> list = this.level().getEntities(this, this.getBoundingBox().inflate(0.2f,-0.01f,0.2f), EntitySelector.pushableBy(this));
+    public void handlePush() {
+        List<Entity> list = this.level().getEntities(this, this.getBoundingBox().inflate(0.2f, -0.01f, 0.2f), EntitySelector.pushableBy(this));
         if (!list.isEmpty()) {
             boolean flag = !this.level().isClientSide && !(this.getControllingPassenger() instanceof Player);
 
@@ -290,16 +262,12 @@ public class AircraftEntity extends Entity {
     }
 
     @Override
-    protected Vec3 getPassengerAttachmentPoint(Entity passenger, EntityDimensions dimensions, float scaleFactor) {
-        return new Vec3(0.0,1.5,0.0);
+    protected @NotNull Vec3 getPassengerAttachmentPoint(@NotNull Entity passenger, @NotNull EntityDimensions dimensions, float scaleFactor) {
+        //Constant seat offset.
+        return new Vec3(0.0, 1.5, 0.0);
     }
 
 
-    
-
-
-
-    
     public Vec3 rotateAxisInternal(float angle, double aX, double aY, double aZ, Vec3 vec) {
         float hangle = angle * 0.5f;
         double sinAngle = (double) Mth.sin(hangle * (float) (Math.PI / 180.0));
@@ -328,38 +296,21 @@ public class AircraftEntity extends Entity {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public double[] recoverRotationsFromCoordinate(){
-        double beta = Math.atan2(Math.sqrt((MainZ.y*MainZ.y)+(MainX.y*MainX.y)),MainY.y);
+    public double[] recoverRotationsFromCoordinate() {
+        double beta = Math.atan2(Math.sqrt((MainZ.y * MainZ.y) + (MainX.y * MainX.y)), MainY.y);
         double alpha;
         double gamma;
-        if (beta<=0.017d){
+        if (beta <= 0.017d) {
             beta = 0.0d;
             alpha = 0.0d;
             gamma = Math.atan2(-MainX.z, MainZ.z);
-        }
-        else if (beta>=3.124d)
-        {
+        } else if (beta >= 3.124d) {
             beta = Math.PI;
-            alpha =0.0d;
+            alpha = 0.0d;
             gamma = Math.atan2(MainX.z, -MainZ.z);
-        }
-        else{
-            alpha = Math.atan2(MainY.x/Math.sin(beta), MainY.z/Math.sin(beta));
-            gamma = Math.atan2(MainX.y/Math.sin(beta), -MainZ.y/Math.sin(beta));
+        } else {
+            alpha = Math.atan2(MainY.x / Math.sin(beta), MainY.z / Math.sin(beta));
+            gamma = Math.atan2(MainX.y / Math.sin(beta), -MainZ.y / Math.sin(beta));
         }
 
         double[] res = new double[3];
@@ -370,44 +321,41 @@ public class AircraftEntity extends Entity {
 
     }
 
-    public void roll_left(){
-        this.MainZ=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainZ);
-        this.MainY=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainY);
-        this.MainX=rotateAxisInternal(-2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainX);
+    public void roll_left() {
+        this.MainZ = rotateAxisInternal(-2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainZ);
+        this.MainY = rotateAxisInternal(-2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainY);
+        this.MainX = rotateAxisInternal(-2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainX);
     }
 
-    public void roll_right(){
-        this.MainZ=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainZ);
-        this.MainY=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainY);
-        this.MainX=rotateAxisInternal(2.0F,this.MainZ.x,this.MainZ.y,this.MainZ.z,this.MainX);
+    public void roll_right() {
+        this.MainZ = rotateAxisInternal(2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainZ);
+        this.MainY = rotateAxisInternal(2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainY);
+        this.MainX = rotateAxisInternal(2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainX);
     }
 
-    public void lift(){
-        this.MainZ=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainZ);
-        this.MainY=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainY);
-        this.MainX=rotateAxisInternal(-2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainX);
+    public void lift() {
+        this.MainZ = rotateAxisInternal(-2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainZ);
+        this.MainY = rotateAxisInternal(-2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainY);
+        this.MainX = rotateAxisInternal(-2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainX);
     }
 
-    public void dive(){
-        this.MainZ=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainZ);
-        this.MainY=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainY);
-        this.MainX=rotateAxisInternal(2.0F,this.MainX.x,this.MainX.y,this.MainX.z,this.MainX);
+    public void dive() {
+        this.MainZ = rotateAxisInternal(2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainZ);
+        this.MainY = rotateAxisInternal(2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainY);
+        this.MainX = rotateAxisInternal(2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainX);
     }
 
-    public void left(){
-        this.MainZ=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainZ);
-        this.MainY=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainY);
-        this.MainX=rotateAxisInternal(2.0F,0.0d,1.0d,0.0d,this.MainX);
+    public void left() {
+        this.MainZ = rotateAxisInternal(2.0F, 0.0d, 1.0d, 0.0d, this.MainZ);
+        this.MainY = rotateAxisInternal(2.0F, 0.0d, 1.0d, 0.0d, this.MainY);
+        this.MainX = rotateAxisInternal(2.0F, 0.0d, 1.0d, 0.0d, this.MainX);
     }
 
-    public void right(){
-        this.MainZ=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainZ);
-        this.MainY=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainY);
-        this.MainX=rotateAxisInternal(-2.0F,0.0d,1.0d,0.0d,this.MainX);
+    public void right() {
+        this.MainZ = rotateAxisInternal(-2.0F, 0.0d, 1.0d, 0.0d, this.MainZ);
+        this.MainY = rotateAxisInternal(-2.0F, 0.0d, 1.0d, 0.0d, this.MainY);
+        this.MainX = rotateAxisInternal(-2.0F, 0.0d, 1.0d, 0.0d, this.MainX);
     }
-
-
-
 
 
 }
