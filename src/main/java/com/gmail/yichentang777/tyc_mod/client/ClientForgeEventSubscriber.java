@@ -2,7 +2,7 @@ package com.gmail.yichentang777.tyc_mod.client;
 
 
 import com.gmail.yichentang777.tyc_mod.TycMod;
-import com.gmail.yichentang777.tyc_mod.client.keybindings.KeyBindings;
+import com.gmail.yichentang777.tyc_mod.client.keybinding.KeyBindings;
 import com.gmail.yichentang777.tyc_mod.entities.AircraftEntity;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
