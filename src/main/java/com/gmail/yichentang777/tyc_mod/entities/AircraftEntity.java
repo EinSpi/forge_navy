@@ -1,10 +1,16 @@
 package com.gmail.yichentang777.tyc_mod.entities;
 
 
+import com.gmail.yichentang777.tyc_mod.CustomModPackets.ServerboundAircraftPacket;
+import com.gmail.yichentang777.tyc_mod.channels.TycModPacketHandler;
+import com.gmail.yichentang777.tyc_mod.serializers.CustomEntityDataSerializers;
+import com.gmail.yichentang777.tyc_mod.utils.AircraftLocalRef;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -14,10 +20,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Quaterniond;
+import org.joml.Vector3f;
 import org.slf4j.Logger;
+
+import net.minecraft.network.syncher.EntityDataSerializers;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
 
 public class AircraftEntity extends Entity {
@@ -29,11 +40,17 @@ public class AircraftEntity extends Entity {
     protected double lerpZ;
     protected double lerpYRot;
     protected double lerpXRot;
+    protected double sinSensitivity=(double) Mth.sin((float) (Math.PI / 180.0));
+    protected double cosSensitivity=(double) Mth.cos((float) (Math.PI / 180.0));
+    
 
     public double controlledSpeed = 0.0d;
-    public Vec3 MainZ = new Vec3(0.0d, 0.0d, 1.0d);
-    public Vec3 MainX = new Vec3(1.0d, 0.0d, 0.0d);
-    public Vec3 MainY = new Vec3(0.0d, 1.0d, 0.0d);
+    public AircraftLocalRef ref=this.entityData.get(LOCAL_REF);
+
+    public static final EntityDataAccessor<AircraftLocalRef> LOCAL_REF =SynchedEntityData.defineId(AircraftEntity.class, CustomEntityDataSerializers.LOCAL_REF);
+
+
+
 
     public AircraftEntity(EntityType<? extends AircraftEntity> entityType, Level level) {
         super(entityType, level);
@@ -42,7 +59,11 @@ public class AircraftEntity extends Entity {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_333664_) {
-
+        p_333664_.define(LOCAL_REF,new AircraftLocalRef(
+                new Vec3(1.0d,0.0d,0.0d),
+                new Vec3(0.0d,1.0d,0.0d),
+                new Vec3(0.0d,0.0d,1.0d)
+        ));
     }
 
     @Override
@@ -74,9 +95,16 @@ public class AircraftEntity extends Entity {
         if (this.isControlledByLocalInstance()) {
             if (this.level().isClientSide) {
                 this.controlAircraft();
+                TycModPacketHandler.CHANNEL.send(new ServerboundAircraftPacket(ref), Objects.requireNonNull(Minecraft.getInstance().getConnection()).getConnection());
             }
+
             this.move(MoverType.SELF, this.getDeltaMovement());
         } else {
+            if (this.level().isClientSide){
+                //when a client not controlling the aircraft, listen to the server and update client copy "ref"
+                ref = this.entityData.get(LOCAL_REF);
+            }
+
             this.setDeltaMovement(Vec3.ZERO);
         }
 
@@ -227,9 +255,9 @@ public class AircraftEntity extends Entity {
         if (this.getControllingPassenger() instanceof LocalPlayer lp) {
 
             if (lp.input.left) {
-                this.left();
+                this.left_right(true);
             } else if (lp.input.right) {
-                this.right();
+                this.left_right(false);
             }
 
             if (lp.input.up) {
@@ -239,7 +267,7 @@ public class AircraftEntity extends Entity {
                 controlledSpeed = controlledSpeed >= -2.0d ? controlledSpeed - 0.1d : controlledSpeed;
             }
 
-            this.setDeltaMovement(this.MainZ.scale(controlledSpeed));
+            this.setDeltaMovement(this.entityData.get(LOCAL_REF).getMainZ().scale(controlledSpeed));
             //LOGGER.info("Y Pos Aircraft {}, Y Pos Player {}",this.getY(),this.getControllingPassenger().getY());
 
         }
@@ -268,94 +296,38 @@ public class AircraftEntity extends Entity {
     }
 
 
-    public Vec3 rotateAxisInternal(float angle, double aX, double aY, double aZ, Vec3 vec) {
-        float hangle = angle * 0.5f;
-        double sinAngle = (double) Mth.sin(hangle * (float) (Math.PI / 180.0));
-        double qx = aX * sinAngle;
-        double qy = aY * sinAngle;
-        double qz = aZ * sinAngle;
-        double qw = Mth.cos(hangle * (float) (Math.PI / 180.0));
-        double w2 = qw * qw;
-        double x2 = qx * qx;
-        double y2 = qy * qy;
-        double z2 = qz * qz;
-        double zw = qz * qw;
-        double xy = qx * qy;
-        double xz = qx * qz;
-        double yw = qy * qw;
-        double yz = qy * qz;
-        double xw = qx * qw;
-        double x = vec.x;
-        double y = vec.y;
-        double z = vec.z;
 
-        double x_end = (w2 + x2 - z2 - y2) * x + (-zw + xy - zw + xy) * y + (yw + xz + xz + yw) * z;
-        double y_end = (xy + zw + zw + xy) * x + (y2 - z2 + w2 - x2) * y + (yz + yz - xw - xw) * z;
-        double z_end = (xz - yw + xz - yw) * x + (yz + yz + xw + xw) * y + (z2 - y2 - x2 + w2) * z;
-        return new Vec3(x_end, y_end, z_end);
+
+
+
+
+    public void roll(boolean left) {
+
+        ref.rotateAround(left,ref.getMainZ().x,ref.getMainZ().y,ref.getMainZ().z,
+                sinSensitivity,cosSensitivity);
+    }
+    
+
+    public void lift_dive(boolean dive) {
+        ref.rotateAround(dive,ref.getMainX().x,ref.getMainX().y,ref.getMainX().z,
+                sinSensitivity,cosSensitivity);
     }
 
 
-    public double[] recoverRotationsFromCoordinate() {
-        double beta = Math.atan2(Math.sqrt((MainZ.y * MainZ.y) + (MainX.y * MainX.y)), MainY.y);
-        double alpha;
-        double gamma;
-        if (beta <= 0.017d) {
-            beta = 0.0d;
-            alpha = 0.0d;
-            gamma = Math.atan2(-MainX.z, MainZ.z);
-        } else if (beta >= 3.124d) {
-            beta = Math.PI;
-            alpha = 0.0d;
-            gamma = Math.atan2(MainX.z, -MainZ.z);
-        } else {
-            alpha = Math.atan2(MainY.x / Math.sin(beta), MainY.z / Math.sin(beta));
-            gamma = Math.atan2(MainX.y / Math.sin(beta), -MainZ.y / Math.sin(beta));
-        }
-
-        double[] res = new double[3];
-        res[0] = beta;
-        res[1] = alpha;
-        res[2] = gamma;
-        return res;
-
-    }
-
-    public void roll_left() {
-        this.MainZ = rotateAxisInternal(-2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainZ);
-        this.MainY = rotateAxisInternal(-2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainY);
-        this.MainX = rotateAxisInternal(-2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainX);
-    }
-
-    public void roll_right() {
-        this.MainZ = rotateAxisInternal(2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainZ);
-        this.MainY = rotateAxisInternal(2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainY);
-        this.MainX = rotateAxisInternal(2.0F, this.MainZ.x, this.MainZ.y, this.MainZ.z, this.MainX);
-    }
-
-    public void lift() {
-        this.MainZ = rotateAxisInternal(-2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainZ);
-        this.MainY = rotateAxisInternal(-2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainY);
-        this.MainX = rotateAxisInternal(-2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainX);
-    }
-
-    public void dive() {
-        this.MainZ = rotateAxisInternal(2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainZ);
-        this.MainY = rotateAxisInternal(2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainY);
-        this.MainX = rotateAxisInternal(2.0F, this.MainX.x, this.MainX.y, this.MainX.z, this.MainX);
-    }
-
-    public void left() {
-        this.MainZ = rotateAxisInternal(2.0F, 0.0d, 1.0d, 0.0d, this.MainZ);
-        this.MainY = rotateAxisInternal(2.0F, 0.0d, 1.0d, 0.0d, this.MainY);
-        this.MainX = rotateAxisInternal(2.0F, 0.0d, 1.0d, 0.0d, this.MainX);
-    }
-
-    public void right() {
-        this.MainZ = rotateAxisInternal(-2.0F, 0.0d, 1.0d, 0.0d, this.MainZ);
-        this.MainY = rotateAxisInternal(-2.0F, 0.0d, 1.0d, 0.0d, this.MainY);
-        this.MainX = rotateAxisInternal(-2.0F, 0.0d, 1.0d, 0.0d, this.MainX);
+    public void left_right(boolean left) {
+        ref.rotateAround(left,0.0d,1.0d,0.0d,
+                sinSensitivity,cosSensitivity);
     }
 
 
+    public void setLocalRef(AircraftLocalRef Ref) {
+        this.entityData.set(LOCAL_REF,Ref);
+
+    }
+
+    @Override
+    public void kill() {
+
+        super.kill();
+    }
 }
