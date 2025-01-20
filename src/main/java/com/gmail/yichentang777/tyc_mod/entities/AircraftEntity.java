@@ -20,12 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.joml.Quaterniond;
-import org.joml.Vector3f;
 import org.slf4j.Logger;
-
-import net.minecraft.network.syncher.EntityDataSerializers;
-
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
@@ -40,16 +35,14 @@ public class AircraftEntity extends Entity {
     protected double lerpZ;
     protected double lerpYRot;
     protected double lerpXRot;
-    protected double sinSensitivity=(double) Mth.sin((float) (Math.PI / 180.0));
-    protected double cosSensitivity=(double) Mth.cos((float) (Math.PI / 180.0));
-    
+    protected double sinSensitivity = Mth.sin((float) (Math.PI / 180.0));
+    protected double cosSensitivity = Mth.cos((float) (Math.PI / 180.0));
+
 
     public double controlledSpeed = 0.0d;
-    public AircraftLocalRef ref=this.entityData.get(LOCAL_REF);
+    public AircraftLocalRef ref = this.entityData.get(LOCAL_REF);
 
-    public static final EntityDataAccessor<AircraftLocalRef> LOCAL_REF =SynchedEntityData.defineId(AircraftEntity.class, CustomEntityDataSerializers.LOCAL_REF);
-
-
+    public static final EntityDataAccessor<AircraftLocalRef> LOCAL_REF = SynchedEntityData.defineId(AircraftEntity.class, CustomEntityDataSerializers.LOCAL_REF);
 
 
     public AircraftEntity(EntityType<? extends AircraftEntity> entityType, Level level) {
@@ -59,10 +52,10 @@ public class AircraftEntity extends Entity {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_333664_) {
-        p_333664_.define(LOCAL_REF,new AircraftLocalRef(
-                new Vec3(1.0d,0.0d,0.0d),
-                new Vec3(0.0d,1.0d,0.0d),
-                new Vec3(0.0d,0.0d,1.0d)
+        p_333664_.define(LOCAL_REF, new AircraftLocalRef(
+                new Vec3(1.0d, 0.0d, 0.0d),
+                new Vec3(0.0d, 1.0d, 0.0d),
+                new Vec3(0.0d, 0.0d, 1.0d)
         ));
     }
 
@@ -100,7 +93,7 @@ public class AircraftEntity extends Entity {
 
             this.move(MoverType.SELF, this.getDeltaMovement());
         } else {
-            if (this.level().isClientSide){
+            if (this.level().isClientSide) {
                 //when a client not controlling the aircraft, listen to the server and update client copy "ref"
                 ref = this.entityData.get(LOCAL_REF);
             }
@@ -296,38 +289,28 @@ public class AircraftEntity extends Entity {
     }
 
 
-
-
-
-
-
     public void roll(boolean left) {
 
-        ref.rotateAround(left,ref.getMainZ().x,ref.getMainZ().y,ref.getMainZ().z,
-                sinSensitivity,cosSensitivity);
+        ref.rotateAround(left, ref.getMainZ().x, ref.getMainZ().y, ref.getMainZ().z,
+                sinSensitivity, cosSensitivity);
     }
-    
+
 
     public void lift_dive(boolean dive) {
-        ref.rotateAround(dive,ref.getMainX().x,ref.getMainX().y,ref.getMainX().z,
-                sinSensitivity,cosSensitivity);
+        ref.rotateAround(dive, ref.getMainX().x, ref.getMainX().y, ref.getMainX().z,
+                sinSensitivity, cosSensitivity);
     }
 
 
     public void left_right(boolean left) {
-        ref.rotateAround(left,0.0d,1.0d,0.0d,
-                sinSensitivity,cosSensitivity);
+        ref.rotateAround(left, 0.0d, 1.0d, 0.0d,
+                sinSensitivity, cosSensitivity);
     }
 
 
     public void setLocalRef(AircraftLocalRef Ref) {
-        this.entityData.set(LOCAL_REF,Ref);
+        this.entityData.set(LOCAL_REF, Ref);
 
     }
 
-    @Override
-    public void kill() {
-
-        super.kill();
-    }
 }
