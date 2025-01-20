@@ -1,11 +1,12 @@
-package com.gmail.yichentang777.tyc_mod;
+package com.gmail.yichentang777.tyc_mod.entities;
 
-import com.gmail.yichentang777.tyc_mod.entities.AircraftEntity;
+import com.gmail.yichentang777.tyc_mod.TycMod;
+import com.gmail.yichentang777.tyc_mod.entities.aircrafts.AircraftEntity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraftforge.registries.RegistryObject;
 
-public class ModEntities {
+public class CustomEntities {
 
     public static final RegistryObject<EntityType<AircraftEntity>> AIRCRAFT_ENTITY_TYPE = TycMod.ENTITY_TYPES.register(
             "aircraft_entity_type",
