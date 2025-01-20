@@ -1,4 +1,4 @@
-package com.gmail.yichentang777.tyc_mod.client.model;// Made with Blockbench 4.11.2
+package com.gmail.yichentang777.tyc_mod.client.models;// Made with Blockbench 4.11.2
 // Exported for Minecraft version 1.17 or later with Mojang mappings
 // Paste this class into your mod and generate all required imports
 
@@ -6,7 +6,6 @@ package com.gmail.yichentang777.tyc_mod.client.model;// Made with Blockbench 4.1
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
