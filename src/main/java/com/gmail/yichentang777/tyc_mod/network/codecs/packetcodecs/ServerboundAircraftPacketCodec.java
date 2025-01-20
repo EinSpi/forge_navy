@@ -1,11 +1,12 @@
-package com.gmail.yichentang777.tyc_mod.CustomModPackets;
+package com.gmail.yichentang777.tyc_mod.network.codecs.packetcodecs;
 
+import com.gmail.yichentang777.tyc_mod.network.packets.ServerboundAircraftPacket;
 import com.gmail.yichentang777.tyc_mod.utils.AircraftLocalRef;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import org.jetbrains.annotations.NotNull;
 
-public class ServerboundAircraftPacketCodec implements StreamCodec<RegistryFriendlyByteBuf,ServerboundAircraftPacket> {
+public class ServerboundAircraftPacketCodec implements StreamCodec<RegistryFriendlyByteBuf, ServerboundAircraftPacket> {
     @Override
     public @NotNull ServerboundAircraftPacket decode(RegistryFriendlyByteBuf buf) {
         return new ServerboundAircraftPacket(new AircraftLocalRef(buf.readVec3(), buf.readVec3(), buf.readVec3(),

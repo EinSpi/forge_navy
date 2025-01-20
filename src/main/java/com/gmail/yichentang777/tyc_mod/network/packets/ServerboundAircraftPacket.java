@@ -1,6 +1,6 @@
-package com.gmail.yichentang777.tyc_mod.CustomModPackets;
+package com.gmail.yichentang777.tyc_mod.network.packets;
 
-import com.gmail.yichentang777.tyc_mod.entities.AircraftEntity;
+import com.gmail.yichentang777.tyc_mod.entities.aircrafts.AircraftEntity;
 import com.gmail.yichentang777.tyc_mod.utils.AircraftLocalRef;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 
