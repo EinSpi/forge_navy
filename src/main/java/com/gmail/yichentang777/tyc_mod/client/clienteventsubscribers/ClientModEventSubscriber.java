@@ -1,11 +1,11 @@
-package com.gmail.yichentang777.tyc_mod.client;
+package com.gmail.yichentang777.tyc_mod.client.clienteventsubscribers;
 
-import com.gmail.yichentang777.tyc_mod.ModEntities;
+import com.gmail.yichentang777.tyc_mod.entities.CustomEntities;
 import com.gmail.yichentang777.tyc_mod.TycMod;
-import com.gmail.yichentang777.tyc_mod.client.keybinding.KeyBindings;
-import com.gmail.yichentang777.tyc_mod.client.model.AircraftModel;
-import com.gmail.yichentang777.tyc_mod.client.renderer.AircraftEntityRenderer;
-import com.gmail.yichentang777.tyc_mod.client.renderer.PilotRendererLayer;
+import com.gmail.yichentang777.tyc_mod.client.keybindings.KeyBindings;
+import com.gmail.yichentang777.tyc_mod.client.models.AircraftModel;
+import com.gmail.yichentang777.tyc_mod.client.renderers.AircraftEntityRenderer;
+import com.gmail.yichentang777.tyc_mod.client.renderers.PilotRendererLayer;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.PlayerSkin;
@@ -22,7 +22,7 @@ public class ClientModEventSubscriber {
 
     @SubscribeEvent
     public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(ModEntities.AIRCRAFT_ENTITY_TYPE.get(), AircraftEntityRenderer::new);
+        event.registerEntityRenderer(CustomEntities.AIRCRAFT_ENTITY_TYPE.get(), AircraftEntityRenderer::new);
 
     }
 
