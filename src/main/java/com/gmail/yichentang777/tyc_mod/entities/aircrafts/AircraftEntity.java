@@ -1,9 +1,9 @@
-package com.gmail.yichentang777.tyc_mod.entities;
+package com.gmail.yichentang777.tyc_mod.entities.aircrafts;
 
 
-import com.gmail.yichentang777.tyc_mod.CustomModPackets.ServerboundAircraftPacket;
-import com.gmail.yichentang777.tyc_mod.channels.TycModPacketHandler;
-import com.gmail.yichentang777.tyc_mod.serializers.CustomEntityDataSerializers;
+import com.gmail.yichentang777.tyc_mod.network.packets.ServerboundAircraftPacket;
+import com.gmail.yichentang777.tyc_mod.network.channels.TycModPacketHandler;
+import com.gmail.yichentang777.tyc_mod.network.serializers.CustomEntityDataSerializers;
 import com.gmail.yichentang777.tyc_mod.utils.AircraftLocalRef;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
