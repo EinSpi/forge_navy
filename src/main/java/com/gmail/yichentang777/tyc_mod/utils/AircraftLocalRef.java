@@ -11,7 +11,7 @@ public class AircraftLocalRef {
     private double renderAngle2;
     private double renderAngle3;
 
-    public AircraftLocalRef(Vec3 mainX, Vec3 mainY, Vec3 mainZ, 
+    public AircraftLocalRef(Vec3 mainX, Vec3 mainY, Vec3 mainZ,
                             double renderAngle1, double renderAngle2, double renderAngle3) {
         this.mainX = mainX;
         this.mainY = mainY;
@@ -21,7 +21,7 @@ public class AircraftLocalRef {
         this.renderAngle3 = renderAngle3;
     }
 
-    public AircraftLocalRef(Vec3 mainX, Vec3 mainY,Vec3 mainZ){
+    public AircraftLocalRef(Vec3 mainX, Vec3 mainY, Vec3 mainZ) {
         this.mainX = mainX;
         this.mainY = mainY;
         this.mainZ = mainZ;
@@ -31,9 +31,11 @@ public class AircraftLocalRef {
     public Vec3 getMainX() {
         return mainX;
     }
+
     public Vec3 getMainY() {
         return mainY;
     }
+
     public Vec3 getMainZ() {
         return mainZ;
     }
@@ -41,9 +43,11 @@ public class AircraftLocalRef {
     public double getRenderAngle1() {
         return renderAngle1;
     }
+
     public double getRenderAngle2() {
         return renderAngle2;
     }
+
     public double getRenderAngle3() {
         return renderAngle3;
     }
@@ -51,17 +55,19 @@ public class AircraftLocalRef {
     public void setMainX(Vec3 mainX) {
         this.mainX = mainX;
     }
+
     public void setMainY(Vec3 mainY) {
         this.mainY = mainY;
     }
+
     public void setMainZ(Vec3 mainZ) {
         this.mainZ = mainZ;
     }
-    
+
     public void rotateAround(boolean direction, double aX, double aY, double aZ, double sinSensitivity, double cosSensitivity) {
-        double qx = direction? aX * sinSensitivity:aX*(-sinSensitivity);
-        double qy = direction? aY * sinSensitivity:aY*(-sinSensitivity);
-        double qz = direction? aZ * sinSensitivity:aZ*(-sinSensitivity);
+        double qx = direction ? aX * sinSensitivity : aX * (-sinSensitivity);
+        double qy = direction ? aY * sinSensitivity : aY * (-sinSensitivity);
+        double qz = direction ? aZ * sinSensitivity : aZ * (-sinSensitivity);
         double qw = cosSensitivity;
         double w2 = qw * qw;
         double x2 = qx * qx;
@@ -91,30 +97,30 @@ public class AircraftLocalRef {
         double z_end = g * x + h * y + i * z;
         this.mainX = new Vec3(x_end, y_end, z_end).normalize();
 
-        x=mainY.x;
-        y=mainY.y;
-        z=mainY.z;
+        x = mainY.x;
+        y = mainY.y;
+        z = mainY.z;
         x_end = a * x + b * y + c * z;
         y_end = d * x + e * y + f * z;
         z_end = g * x + h * y + i * z;
-        this.mainY =new Vec3(x_end, y_end, z_end).normalize();
+        this.mainY = new Vec3(x_end, y_end, z_end).normalize();
 
-        x=mainZ.x;
-        y=mainZ.y;
-        z=mainZ.z;
+        x = mainZ.x;
+        y = mainZ.y;
+        z = mainZ.z;
         x_end = a * x + b * y + c * z;
         y_end = d * x + e * y + f * z;
         z_end = g * x + h * y + i * z;
-        this.mainZ =new Vec3(x_end, y_end, z_end).normalize();
+        this.mainZ = new Vec3(x_end, y_end, z_end).normalize();
 
 
     }
 
     public void recoverRotationsFromCoordinate() {
         double sinbeta = Math.sqrt((mainZ.y * mainZ.y) + (mainX.y * mainX.y));
-        double beta = Math.atan2(sinbeta,mainY.y);
+        double beta = Math.atan2(sinbeta, mainY.y);
         if (beta <= 0.017d) {
-            
+
             renderAngle1 = 0.0d;
             renderAngle2 = 0.0d;
             renderAngle3 = Math.atan2(-mainX.z, mainZ.z);
