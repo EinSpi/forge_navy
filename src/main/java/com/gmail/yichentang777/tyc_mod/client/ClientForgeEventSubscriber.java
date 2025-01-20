@@ -33,21 +33,21 @@ public class ClientForgeEventSubscriber {
             suppressVanillaKeyAction(Minecraft.getInstance().options.keyInventory);
             if (KeyBindings.ROLL_LEFT.isDown()) {
 
-                ac.roll_left();
+                ac.roll(false);
                 suppressVanillaKeyAction(Minecraft.getInstance().options.keyDrop);
             }
             if (KeyBindings.ROLL_RIGHT.isDown()) {
 
-                ac.roll_right();
+                ac.roll(true);
                 suppressVanillaKeyAction(Minecraft.getInstance().options.keyInventory);
             }
 
             if (KeyBindings.LIFT.isDown()) {
-                ac.lift();
+                ac.lift_dive(false);
             }
 
             if (KeyBindings.DIVE.isDown()) {
-                ac.dive();
+                ac.lift_dive(true);
             }
 
 
@@ -64,6 +64,9 @@ public class ClientForgeEventSubscriber {
                 //Set the player invisible to ignore vanilla render, fully rely on custom defined render layer, avoid visual duplication.
                 abstractClientPlayer.setInvisible(true);
 
+            }
+            else{
+                abstractClientPlayer.setInvisible(false);
             }
         }
     }
