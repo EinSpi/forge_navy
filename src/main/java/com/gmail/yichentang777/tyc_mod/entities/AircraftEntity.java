@@ -289,9 +289,9 @@ public class AircraftEntity extends Entity {
     }
 
 
-    public void roll(boolean left) {
+    public void roll(boolean right) {
 
-        ref.rotateAround(left, ref.getMainZ().x, ref.getMainZ().y, ref.getMainZ().z,
+        ref.rotateAround(right, ref.getMainZ().x, ref.getMainZ().y, ref.getMainZ().z,
                 sinSensitivity, cosSensitivity);
     }
 
