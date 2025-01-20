@@ -5,20 +5,19 @@ import com.gmail.yichentang777.tyc_mod.TycMod;
 import com.gmail.yichentang777.tyc_mod.client.model.AircraftModel;
 import com.gmail.yichentang777.tyc_mod.entities.AircraftEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Quaternionf;
+import org.jetbrains.annotations.NotNull;
 
 public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
 
     private final AircraftModel model;
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(TycMod.MODID, "textures/entity/aircraft3.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(TycMod.MODID, "textures/entity/aircraft.png");
 
     public AircraftEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -26,7 +25,7 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(AircraftEntity entity) {
+    public @NotNull ResourceLocation getTextureLocation(@NotNull AircraftEntity entity) {
         return TEXTURE;
     }
 
@@ -36,11 +35,16 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
         poseStack.translate(0.0D, 2.3D, 0.0D);
         // Adjust Y offset to align the model with the ground
         poseStack.mulPose(Axis.ZP.rotationDegrees(180.0f));
-        double[] eulerangles=entity.recoverRotationsFromCoordinate();
 
-        poseStack.mulPose(Axis.YP.rotation(-(float)eulerangles[1]));
-        poseStack.mulPose(Axis.XP.rotation(-(float)eulerangles[0]));
-        poseStack.mulPose(Axis.YP.rotation(-(float)eulerangles[2]));
+        if (entity.isControlledByLocalInstance()) {
+            //if insControlled locally, compute euler angles, otherwise trust ref itself.
+            entity.ref.recoverRotationsFromCoordinate();
+        }
+
+        poseStack.mulPose(Axis.YP.rotation(-(float) entity.ref.getRenderAngle2()));
+        poseStack.mulPose(Axis.XP.rotation(-(float) entity.ref.getRenderAngle1()));
+        poseStack.mulPose(Axis.YP.rotation(-(float) entity.ref.getRenderAngle3()));
+
 
         // Pitch (vertical rotation)
 
