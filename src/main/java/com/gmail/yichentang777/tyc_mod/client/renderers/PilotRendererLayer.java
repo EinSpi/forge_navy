@@ -1,7 +1,6 @@
-package com.gmail.yichentang777.tyc_mod.client.renderer;
+package com.gmail.yichentang777.tyc_mod.client.renderers;
 
-import com.gmail.yichentang777.tyc_mod.entities.AircraftEntity;
-import com.gmail.yichentang777.tyc_mod.utils.AircraftLocalRef;
+import com.gmail.yichentang777.tyc_mod.entities.aircrafts.AircraftEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.PlayerModel;

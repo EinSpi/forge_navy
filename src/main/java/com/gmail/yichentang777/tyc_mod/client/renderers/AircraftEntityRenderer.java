@@ -1,9 +1,9 @@
-package com.gmail.yichentang777.tyc_mod.client.renderer;
+package com.gmail.yichentang777.tyc_mod.client.renderers;
 
 import com.mojang.math.Axis;
 import com.gmail.yichentang777.tyc_mod.TycMod;
-import com.gmail.yichentang777.tyc_mod.client.model.AircraftModel;
-import com.gmail.yichentang777.tyc_mod.entities.AircraftEntity;
+import com.gmail.yichentang777.tyc_mod.client.models.AircraftModel;
+import com.gmail.yichentang777.tyc_mod.entities.aircrafts.AircraftEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
