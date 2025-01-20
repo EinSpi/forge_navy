@@ -1,5 +1,6 @@
 package com.gmail.yichentang777.tyc_mod;
 
+import com.gmail.yichentang777.tyc_mod.entities.CustomEntities;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
@@ -65,7 +66,7 @@ public class TycMod {
                 output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
             }).build());
 
-    public static final int a = ModEntities.init();
+    public static final int a = CustomEntities.init();
 
 
     public TycMod() {
