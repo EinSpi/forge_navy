@@ -1,4 +1,4 @@
-package com.gmail.yichentang777.tyc_mod.client.keybinding;
+package com.gmail.yichentang777.tyc_mod.client.keybindings;
 
 import net.minecraft.client.KeyMapping;
 import org.lwjgl.glfw.GLFW;
