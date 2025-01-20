@@ -2,7 +2,7 @@ package com.gmail.yichentang777.tyc_mod.entities.aircrafts;
 
 
 import com.gmail.yichentang777.tyc_mod.network.packets.ServerboundAircraftPacket;
-import com.gmail.yichentang777.tyc_mod.network.channels.TycModPacketHandler;
+import com.gmail.yichentang777.tyc_mod.network.channels.Channels;
 import com.gmail.yichentang777.tyc_mod.network.serializers.CustomEntityDataSerializers;
 import com.gmail.yichentang777.tyc_mod.utils.AircraftLocalRef;
 import com.mojang.logging.LogUtils;
@@ -88,7 +88,7 @@ public class AircraftEntity extends Entity {
         if (this.isControlledByLocalInstance()) {
             if (this.level().isClientSide) {
                 this.controlAircraft();
-                TycModPacketHandler.CHANNEL.send(new ServerboundAircraftPacket(ref), Objects.requireNonNull(Minecraft.getInstance().getConnection()).getConnection());
+                Channels.CHANNEL.send(new ServerboundAircraftPacket(ref), Objects.requireNonNull(Minecraft.getInstance().getConnection()).getConnection());
             }
 
             this.move(MoverType.SELF, this.getDeltaMovement());
