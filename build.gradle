@@ -81,6 +81,23 @@ minecraft {
         client {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', mod_id
+
+        }
+
+        client1 {
+            // 自定义客户端任务 1
+            workingDirectory project.file('run/client1')
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args '--launchTarget', 'forge_userdev_client', '--version', 'MOD_DEV', '--gameDir', 'run/client1', '--assetsDir', 'C:\\Users\\tyc\\.gradle\\caches\\forge_gradle\\assets','--accessToken','player1'
+            main = 'net.minecraft.client.main.Main'
+        }
+
+        client2 {
+            // 自定义客户端任务 2
+            workingDirectory project.file('run/client2')
+            property 'forge.enabledGameTestNamespaces', mod_id
+            args  '--launchTarget', 'forge_userdev_client', '--version', 'MOD_DEV', '--gameDir', 'run/client1', '--assetsDir', 'C:\\Users\\tyc\\.gradle\\caches\\forge_gradle\\assets','--accessToken','player2'
+            main = 'net.minecraft.client.main.Main'
         }
 
         server {
@@ -102,6 +119,9 @@ minecraft {
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
         }
+
+
+
     }
 }
 
