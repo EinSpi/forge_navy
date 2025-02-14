@@ -17,7 +17,7 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
 
     private final AircraftModel model;
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(TycMod.MODID, "textures/entity/aircraft.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(TycMod.MODID, "textures/entity/aircraft3.png");
 
     public AircraftEntityRenderer(EntityRendererProvider.Context context) {
         super(context);

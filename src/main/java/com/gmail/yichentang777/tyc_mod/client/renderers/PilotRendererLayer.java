@@ -31,6 +31,7 @@ public class PilotRendererLayer extends RenderLayer<AbstractClientPlayer, Player
             if (aircraft.isControlledByLocalInstance()){
                 aircraft.ref.recoverRotationsFromCoordinate();
             }
+
             poseStack.mulPose(Axis.YP.rotation(-(float) aircraft.ref.getRenderAngle2()));
             poseStack.mulPose(Axis.XP.rotation((float) aircraft.ref.getRenderAngle1()));
             poseStack.mulPose(Axis.YP.rotation(-(float) aircraft.ref.getRenderAngle3()));

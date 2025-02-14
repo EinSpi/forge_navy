@@ -9,15 +9,23 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.ContainerEntity;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -26,7 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-public class AircraftEntity extends Entity {
+public class AircraftEntity extends Entity implements ContainerEntity {
 
     private static final Logger LOGGER = LogUtils.getLogger();
     protected int lerpSteps;
@@ -37,6 +45,11 @@ public class AircraftEntity extends Entity {
     protected double lerpXRot;
     protected double sinSensitivity = Mth.sin((float) (Math.PI / 180.0));
     protected double cosSensitivity = Mth.cos((float) (Math.PI / 180.0));
+    private static final int CONTAINER_SIZE = 27;
+    private NonNullList<ItemStack> itemStacks = NonNullList.withSize(CONTAINER_SIZE, ItemStack.EMPTY);
+    @Nullable
+    private ResourceKey<LootTable> lootTable;
+    private long lootTableSeed;
 
 
     public double controlledSpeed = 0.0d;
@@ -230,10 +243,10 @@ public class AircraftEntity extends Entity {
     @Override
     public @NotNull InteractionResult interact(@NotNull Player player, @NotNull InteractionHand hand) {
         this.controlledSpeed = 0.0d;
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide && this.canAddPassenger(player) && !player.isSecondaryUseActive()) {
             return player.startRiding(this) ? InteractionResult.CONSUME : InteractionResult.PASS;
         } else {
-            return InteractionResult.SUCCESS;
+            return this.interactWithContainerVehicle(player);
         }
 
     }
@@ -312,5 +325,114 @@ public class AircraftEntity extends Entity {
         this.entityData.set(LOCAL_REF, Ref);
 
     }
+
+
+
+    @Override
+    public @org.jetbrains.annotations.Nullable ResourceKey<LootTable> getLootTable() {
+        return null;
+    }
+
+    @Override
+    public void setLootTable(@org.jetbrains.annotations.Nullable ResourceKey<LootTable> lt) {
+        this.lootTable = lt;
+    }
+
+    @Override
+    public long getLootTableSeed() {
+        return 0;
+    }
+
+    @Override
+    public void setLootTableSeed(long seed) {
+        this.lootTableSeed = seed;
+    }
+
+    @Override
+    public @NotNull NonNullList<ItemStack> getItemStacks() {
+        return this.itemStacks;
+    }
+
+    @Override
+    public void clearItemStacks() {
+        this.itemStacks = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+    }
+
+    @Override
+    public int getContainerSize() {
+        return CONTAINER_SIZE;
+    }
+
+    @Override
+    public @NotNull ItemStack getItem(int i) {
+        return this.getChestVehicleItem(i);
+    }
+
+    @Override
+    public @NotNull ItemStack removeItem(int a, int b) {
+        return this.removeChestVehicleItem(a, b);
+    }
+
+    @Override
+    public @NotNull ItemStack removeItemNoUpdate(int i) {
+        return this.removeChestVehicleItemNoUpdate(i);
+    }
+
+    @Override
+    public void setItem(int i, @NotNull ItemStack is) {
+        this.setChestVehicleItem(i, is);
+    }
+
+    @Override
+    public void setChanged() {
+
+    }
+
+    @Override
+    public boolean stillValid(@NotNull Player player) {
+        return this.isChestVehicleStillValid(player);
+    }
+
+    @Override
+    public void clearContent() {
+
+    }
+
+    @Override
+    public @org.jetbrains.annotations.Nullable AbstractContainerMenu createMenu(int idx, Inventory inv, Player p) {
+        if (this.lootTable != null && p.isSpectator()) {
+            return null;
+        } else {
+            this.unpackLootTable(inv.player);
+            return ChestMenu.threeRows(idx, inv, this);
+        }
+    }
+
+    @Override
+    public @NotNull InteractionResult interactWithContainerVehicle(@NotNull Player p_270068_) {
+        return ContainerEntity.super.interactWithContainerVehicle(p_270068_);
+    }
+
+    public void unpackLootTable(@Nullable Player p_219914_) {
+        this.unpackChestVehicleLootTable(p_219914_);
+    }
+
+    @Override
+    public @NotNull SlotAccess getSlot(int i) {
+        return this.getChestVehicleSlot(i);
+    }
+
+    @Override
+    public int getMaxStackSize() {
+        return 2;
+    }
+
+    @Override
+    public boolean canPlaceItem(int slot, ItemStack stack) {
+        // 检查是否超出最大堆叠限e
+        return  this.getItem(slot).getCount()<this.getMaxStackSize();
+
+    }
+
 
 }
