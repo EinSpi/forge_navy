@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 public class PilotRendererLayer extends RenderLayer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> {
@@ -31,10 +32,12 @@ public class PilotRendererLayer extends RenderLayer<AbstractClientPlayer, Player
             if (aircraft.isControlledByLocalInstance()){
                 aircraft.ref.recoverRotationsFromCoordinate();
             }
-
+            Vec3 ae_prime=aircraft.ref.getMainY().multiply(0.3,0.3,0.3);
+            Vec3 aa_prime=ae_prime.add(0.0,-ae_prime.length(),0.0D);
+            poseStack.translate(-aa_prime.x, aa_prime.y, aa_prime.z);
             poseStack.mulPose(Axis.YP.rotation(-(float) aircraft.ref.getRenderAngle2()));
             poseStack.mulPose(Axis.XP.rotation((float) aircraft.ref.getRenderAngle1()));
-            poseStack.mulPose(Axis.YP.rotation(-(float) aircraft.ref.getRenderAngle3()));
+            poseStack.mulPose(Axis.ZP.rotation(-(float) aircraft.ref.getRenderAngle3()));
             this.getParentModel().renderToBuffer(poseStack,
                     buffer.getBuffer(RenderType.entityTranslucent(player.getSkin().texture())),
                     packedLight, OverlayTexture.NO_OVERLAY,
