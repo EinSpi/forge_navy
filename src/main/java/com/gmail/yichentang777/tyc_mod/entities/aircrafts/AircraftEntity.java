@@ -18,8 +18,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.ContainerEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
@@ -298,7 +300,9 @@ public class AircraftEntity extends Entity implements ContainerEntity {
     @Override
     protected @NotNull Vec3 getPassengerAttachmentPoint(@NotNull Entity passenger, @NotNull EntityDimensions dimensions, float scaleFactor) {
         //Constant seat offset.
-        return new Vec3(0.0, 1.5, 0.0);
+        Vec3 ae_prime=ref.getMainY().multiply(0.3,0.3,0.3);
+        Vec3 aa_prime=ae_prime.add(0.0,-ae_prime.length(),0.0D);
+        return new Vec3(0.0, 1.5, 0.0).add(aa_prime);
     }
 
 
@@ -433,6 +437,9 @@ public class AircraftEntity extends Entity implements ContainerEntity {
         return  this.getItem(slot).getCount()<this.getMaxStackSize();
 
     }
+
+
+
 
 
 }
