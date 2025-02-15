@@ -43,7 +43,7 @@ public class AircraftEntityRenderer extends EntityRenderer<AircraftEntity> {
 
         poseStack.mulPose(Axis.YP.rotation(-(float) entity.ref.getRenderAngle2()));
         poseStack.mulPose(Axis.XP.rotation(-(float) entity.ref.getRenderAngle1()));
-        poseStack.mulPose(Axis.YP.rotation(-(float) entity.ref.getRenderAngle3()));
+        poseStack.mulPose(Axis.ZP.rotation((float) entity.ref.getRenderAngle3()));
 
 
         // Pitch (vertical rotation)
