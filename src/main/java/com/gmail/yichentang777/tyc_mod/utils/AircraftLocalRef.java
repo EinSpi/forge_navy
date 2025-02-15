@@ -117,21 +117,21 @@ public class AircraftLocalRef {
     }
 
     public void recoverRotationsFromCoordinate() {
-        double sinbeta = Math.sqrt((mainZ.y * mainZ.y) + (mainX.y * mainX.y));
-        double beta = Math.atan2(sinbeta, mainY.y);
-        if (beta <= 0.017d) {
-
-            renderAngle1 = 0.0d;
+        double cosbeta=Math.sqrt((mainZ.z * mainZ.z) + (mainZ.x * mainZ.x));
+        double beta = Math.atan2(-mainZ.y, cosbeta);
+        if (beta <= 0.017d-(Math.PI/2.0d)) {
+            //beta is almost - half pi
+            renderAngle1 = -(Math.PI/2.0d);
             renderAngle2 = 0.0d;
-            renderAngle3 = Math.atan2(-mainX.z, mainZ.z);
-        } else if (beta >= 3.124d) {
-            renderAngle1 = Math.PI;
+            renderAngle3 = -Math.atan2(mainX.z, mainX.x);
+        } else if (beta >= 3.124d-(Math.PI/2.0d)) {
+            renderAngle1 = Math.PI/2.0d;
             renderAngle2 = 0.0d;
-            renderAngle3 = Math.atan2(mainX.z, -mainZ.z);
+            renderAngle3 = Math.atan2(mainX.z, mainX.x);
         } else {
             renderAngle1 = beta;
-            renderAngle2 = Math.atan2(mainY.x / sinbeta, mainY.z / sinbeta);
-            renderAngle3 = Math.atan2(mainX.y / sinbeta, -mainZ.y / sinbeta);
+            renderAngle2 = Math.atan2(mainZ.x / cosbeta, mainZ.z / cosbeta);
+            renderAngle3 = Math.atan2(mainX.y / cosbeta, mainY.y / cosbeta);
         }
 
     }
